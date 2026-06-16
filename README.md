@@ -1,7 +1,7 @@
 # DeepLearning RAG Chatbot
 
 A modern AI-powered PDF chatbot built using **LangChain**, **FastAPI**, **ChromaDB**, and **Next.js**.  
-The application uses **Retrieval-Augmented Generation (RAG)** to answer questions from PDF documents with semantic search and source citations.
+The application uses **Retrieval-Augmented Generation (RAG)** to answer questions from pre-indexed technical documents using semantic search and source-grounded responses with citations.
 
 # Demo Video
 
