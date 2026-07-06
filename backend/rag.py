@@ -1,26 +1,15 @@
 from dotenv import load_dotenv
-from langchain_openai import OpenAIEmbeddings
-from langchain_community.vectorstores import Chroma
 from langchain_mistralai import ChatMistralAI   
 from langchain_core.prompts import ChatPromptTemplate
+# from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
+from ingestion import embedding_model
+import os
 
 load_dotenv()
 
-embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
 
-vectorstore = Chroma(
-    persist_directory="chroma_db",
-    embedding_function=embedding_model
-)
 
-retriever = vectorstore.as_retriever(
-    search_type="mmr",
-    search_kwargs={
-        "k": 5,
-        "fetch_k": 10,
-        "lambda_mult": 0.5
-        }
-)
 
 llm = ChatMistralAI(model="mistral-small-2506")
 
@@ -48,13 +37,24 @@ prompt = ChatPromptTemplate.from_messages(
 
 # from rich import print
 
-def ask_question(query: str) -> str:
+def ask_question(query):
+
+    retriever = Chroma(persist_directory="chroma_db", embedding_function=embedding_model).as_retriever(
+        search_type="mmr",
+        search_kwargs={
+            "k": 5,
+            "fetch_k": 10,
+            "lambda_mult": 0.5
+            }
+    )
 
     docs = retriever.invoke(query)
 
-    # print(docs)
+    print(docs)
 
-    m_data = [(doc.metadata["page_label"],doc.metadata["source"]) for doc in docs]
+    path_name = "uploads\\"
+
+    m_data = [(doc.metadata["page_label"],os.path.basename(doc.metadata["source"])) for doc in docs]
 
     unique_sources = set([data for data in m_data])
 

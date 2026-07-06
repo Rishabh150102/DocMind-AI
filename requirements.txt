@@ -4,6 +4,7 @@
 langchain
 langchain-core
 langchain-community
+langchain-chroma
 
 # =========================
 # LLM Providers

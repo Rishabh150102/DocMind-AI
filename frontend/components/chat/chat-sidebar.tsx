@@ -1,46 +1,48 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, DragEvent } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import {
-  MessageSquare,
-  Plus,
-  Menu,
-  X,
-  Trash2,
-  PanelLeftClose,
-  PanelLeft,
-  Sparkles,
-} from "lucide-react"
-
-interface Conversation {
-  id: string
-  title: string
-  timestamp: Date
-}
+import { UploadCloud, FileText, CheckCircle2, Loader2, Menu, X, Brain } from "lucide-react"
+import { toast } from "sonner"
 
 interface ChatSidebarProps {
-  conversations: Conversation[]
-  activeConversationId: string | null
-  onSelectConversation: (id: string) => void
-  onNewConversation: () => void
-  onDeleteConversation: (id: string) => void
+  uploadStatus: "idle" | "uploading" | "processing" | "ready" | "error"
+  fileName: string | null
+  onUpload: (file: File) => void
   isOpen: boolean
   onToggle: () => void
 }
 
 export function ChatSidebar({
-  conversations,
-  activeConversationId,
-  onSelectConversation,
-  onNewConversation,
-  onDeleteConversation,
+  uploadStatus,
+  fileName,
+  onUpload,
   isOpen,
   onToggle,
 }: ChatSidebarProps) {
-  const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      onUpload(file)
+    }
+  }
+
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+  }
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    const file = e.dataTransfer.files?.[0]
+    if (file && file.type === "application/pdf") {
+      onUpload(file)
+    } else {
+      toast.error("Please upload a PDF file.")
+    }
+  }
 
   return (
     <>
@@ -55,139 +57,119 @@ export function ChatSidebar({
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-0 z-50 flex h-full flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300 ease-in-out md:relative",
-          isOpen ? "w-72 translate-x-0" : "w-0 -translate-x-full md:w-16 md:translate-x-0"
+          "fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-secondary border-r border-border transition-transform duration-300 ease-in-out md:static md:translate-x-0",
+          isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        {/* Header */}
-        <div className={cn(
-          "flex h-16 items-center border-b border-sidebar-border px-4",
-          isOpen ? "justify-between" : "justify-center"
-        )}>
-          {isOpen && (
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-accent glow-accent-sm">
-                <Sparkles className="h-4 w-4 text-white" />
-              </div>
-              <h1 className="text-lg font-semibold text-sidebar-foreground">DeepLearning RAG</h1>
+        <div className="flex items-center justify-between p-4 border-b border-border">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-accent text-accent-foreground">
+              <Brain size={18} />
             </div>
-          )}
+            <h1 className="text-sm font-semibold tracking-tight">
+              DocMind AI
+            </h1>
+          </div>
           <Button
             variant="ghost"
             size="icon"
+            className="md:hidden"
             onClick={onToggle}
-            className="shrink-0 hover:bg-sidebar-accent transition-colors"
           >
-            {isOpen ? (
-              <>
-                <X className="h-5 w-5 md:hidden" />
-                <PanelLeftClose className="hidden h-5 w-5 md:block" />
-              </>
-            ) : (
-              <PanelLeft className="hidden h-5 w-5 md:block" />
-            )}
+            <X size={18} />
           </Button>
         </div>
 
-        {/* New Chat Button */}
-        <div className={cn("p-3", !isOpen && "hidden md:block md:px-2")}>
-          <button
-            onClick={onNewConversation}
+        <div className="flex-1 flex flex-col p-4 gap-6">
+          <div
             className={cn(
-              "inline-flex items-center rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-all duration-200",
-              "bg-gradient-to-r from-[oklch(0.55_0.22_280)] to-[oklch(0.50_0.18_250)]",
-              "hover:from-[oklch(0.60_0.24_280)] hover:to-[oklch(0.55_0.20_250)]",
-              "shadow-[0_0_20px_-5px_oklch(0.55_0.20_280_/_0.4)]",
-              "hover:shadow-[0_0_25px_-3px_oklch(0.60_0.22_280_/_0.5)]",
-              isOpen ? "w-full justify-start gap-2" : "w-full justify-center"
+              "group flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl p-8 text-center bg-background/50 hover:bg-secondary hover:border-accent/50 transition-all duration-200 cursor-pointer",
+              (uploadStatus === "uploading" || uploadStatus === "processing") && "opacity-50 pointer-events-none"
             )}
-            title="New Chat"
+            onClick={() => fileInputRef.current?.click()}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
           >
-            <Plus className="h-4 w-4 shrink-0" />
-            {isOpen && <span>New Chat</span>}
-          </button>
-        </div>
+            <UploadCloud size={28} className="mb-3 text-muted-foreground group-hover:text-accent transition-colors" />
+            <p className="text-sm font-medium mb-1">Upload PDF</p>
+            <p className="text-xs text-muted-foreground">Drag and drop or browse</p>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="application/pdf"
+              className="hidden"
+            />
+          </div>
 
-        {/* Conversations List */}
-        <ScrollArea className={cn("flex-1", isOpen ? "px-3" : "hidden md:block md:px-2")}>
-          <div className="space-y-1 pb-4">
-            {conversations.length === 0 ? (
-              isOpen && (
-                <p className="px-3 py-8 text-center text-sm text-muted-foreground">
-                  No conversations yet
-                </p>
-              )
-            ) : (
-              conversations.map((conversation) => (
-                <div
-                  key={conversation.id}
-                  className={cn(
-                    "group relative flex cursor-pointer items-center gap-3 rounded-xl text-sm transition-all duration-200",
-                    isOpen ? "px-3 py-2.5" : "justify-center p-2",
-                    activeConversationId === conversation.id
-                      ? "glass-subtle text-sidebar-accent-foreground"
-                      : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-                  )}
-                  onClick={() => onSelectConversation(conversation.id)}
-                  onMouseEnter={() => setHoveredId(conversation.id)}
-                  onMouseLeave={() => setHoveredId(null)}
-                  title={!isOpen ? conversation.title : undefined}
-                >
-                  <MessageSquare className="h-4 w-4 shrink-0 text-muted-foreground" />
-                  {isOpen && (
+          <div className="flex flex-col gap-3">
+            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Document Status
+            </h2>
+            {fileName ? (
+              <div className="flex flex-col gap-3 p-3.5 rounded-xl bg-background border border-border shadow-sm">
+                <div className="flex items-center gap-2">
+                  <FileText size={16} className="text-accent shrink-0" />
+                  <span className="text-sm font-medium truncate">{fileName}</span>
+                </div>
+                
+                <div className="flex items-center gap-2 text-xs">
+                  {uploadStatus === "uploading" && (
                     <>
-                      <span className="flex-1 truncate">{conversation.title}</span>
-                      {hoveredId === conversation.id && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            onDeleteConversation(conversation.id)
-                          }}
-                        >
-                          <Trash2 className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
-                        </Button>
-                      )}
+                      <Loader2 size={14} className="animate-spin text-muted-foreground" />
+                      <span className="text-muted-foreground">Uploading...</span>
+                    </>
+                  )}
+                  {uploadStatus === "processing" && (
+                    <>
+                      <Loader2 size={14} className="animate-spin text-accent" />
+                      <span className="text-accent">Processing...</span>
+                    </>
+                  )}
+                  {uploadStatus === "ready" && (
+                    <>
+                      <CheckCircle2 size={14} className="text-green-500" />
+                      <span className="text-green-500">Ready</span>
+                    </>
+                  )}
+                  {uploadStatus === "error" && (
+                    <>
+                      <X size={14} className="text-destructive" />
+                      <span className="text-destructive">Upload failed</span>
                     </>
                   )}
                 </div>
-              ))
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center p-6 text-center border border-dashed border-border/50 rounded-xl bg-background/30">
+                <p className="text-[13px] text-muted-foreground">
+                  No document uploaded.
+                </p>
+              </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
 
-        {/* Footer */}
-        <div className={cn(
-          "border-t border-sidebar-border p-4",
-          !isOpen && "hidden md:block md:p-2"
-        )}>
-          {isOpen ? (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
-              <span>Powered by AI</span>
-            </div>
-          ) : (
-            <div className="flex justify-center">
-              <div className="h-2 w-2 rounded-full bg-accent animate-pulse" title="Powered by AI" />
-            </div>
-          )}
+        <div className="p-4 mt-auto border-t border-border/50 text-[11px] text-muted-foreground">
+          <div className="font-semibold text-foreground/80 mb-1">DocMind AI</div>
+          <p className="leading-relaxed">
+            AI-powered document question answering using<br />
+            <span className="font-mono text-[10px] mt-1 block opacity-80">FastAPI &bull; LangChain &bull; ChromaDB &bull; OpenAI Embeddings &bull; Mistral AI</span>
+          </p>
         </div>
       </aside>
 
       {/* Mobile toggle button */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onToggle}
-        className={cn(
-          "fixed left-4 top-4 z-30 glass md:hidden",
-          isOpen && "hidden"
-        )}
-      >
-        <Menu className="h-5 w-5" />
-      </Button>
+      {!isOpen && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="fixed left-4 top-4 z-40 md:hidden bg-secondary border border-border"
+          onClick={onToggle}
+        >
+          <Menu size={18} />
+        </Button>
+      )}
     </>
   )
 }

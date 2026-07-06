@@ -1,14 +1,15 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { Toaster } from 'sonner'
 import './globals.css'
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
 
 export const metadata: Metadata = {
-  title: 'DeepLearning RAG Chatbot | AI Document Chat',
-  description: 'Chat with your PDF documents using AI-powered retrieval augmented generation',
+  title: 'DocMind AI',
+  description: 'Upload a PDF and start asking intelligent questions about your document.',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -45,6 +46,7 @@ export default function RootLayout({
     <html lang="en" className="dark bg-background">
       <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
         {children}
+        <Toaster theme="dark" position="top-center" />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
