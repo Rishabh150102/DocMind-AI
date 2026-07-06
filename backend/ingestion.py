@@ -59,14 +59,15 @@ def create_vector_store(chunks):
 def reset_knowledge_base():        
     
     folder_path = "uploads"
-    contents = os.listdir(folder_path)
-    if not contents:
-        print("The folder is already empty. No action taken.")
-    else:
-        for item in contents:
-            os.remove(os.path.join(folder_path, item))
+    if os.path.exists(folder_path):
+        contents = os.listdir(folder_path)
+        if not contents:
+            print("The folder is already empty. No action taken.")
+        else:
+            for item in contents:
+                os.remove(os.path.join(folder_path, item))
 
-        print("Uploaded file deleted.!!")
+            print("Uploaded file deleted.!!")
 
     return "Everything clear and ready to use."
 
