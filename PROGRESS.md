@@ -255,3 +255,23 @@ Version 4
 * User authentication
 * Persistent document library
 * Production-ready architecture
+
+---
+
+# Progress Log - UI/UX Refinements
+
+**Date:** 2026-07-06
+
+---
+
+## 1. Modernized Error Handling & Notifications
+- Replaced all native browser `alert()` dialogs with modern, theme-consistent toast notifications.
+- Integrated the `sonner` library by adding a global `<Toaster theme="dark" position="top-center" />` component to the Next.js root layout (`frontend/app/layout.tsx`).
+- Updated file upload validations in `ChatContainer` and drag-and-drop interactions in `ChatSidebar` to use `toast.error()`.
+- This change improves the user experience without modifying any underlying backend functionality.
+
+## 2. Added Tech Stack Visibility (Footer)
+- Added a dedicated "About" footer at the bottom of the `ChatSidebar` (`frontend/components/chat/chat-sidebar.tsx`).
+- Displays the complete tech stack clearly: "AI-powered document question answering using FastAPI • LangChain • ChromaDB • OpenAI Embeddings • Mistral AI".
+- Uses Flexbox layouts and Tailwind utility classes (`font-mono`, `text-muted-foreground`, etc.) to perfectly align with the "DocMind AI" dark theme aesthetic.
+- Ensures that recruiters and technical reviewers can instantly identify the architecture at a glance.

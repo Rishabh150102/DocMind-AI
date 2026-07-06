@@ -6,6 +6,7 @@ import { ChatMessage } from "./chat-message"
 import { ChatInput } from "./chat-input"
 import { Brain } from "lucide-react"
 import { toast } from "sonner"
+import { API_BASE_URL } from "@/lib/api"
 
 interface Source {
   title?: string
@@ -51,7 +52,7 @@ export function ChatContainer() {
     setIsLoading(true)
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/chat", {
+      const response = await fetch(`${API_BASE_URL}/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -106,7 +107,7 @@ export function ChatContainer() {
       // But we can just set it to processing to show the state briefly
       setUploadStatus("processing")
       
-      const response = await fetch("http://127.0.0.1:8000/upload", {
+      const response = await fetch(`${API_BASE_URL}/upload`, {
         method: "POST",
         body: formData,
       })
