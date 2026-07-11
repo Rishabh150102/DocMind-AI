@@ -30,6 +30,7 @@ backend/chroma_db/
 # ========================================
 uploads/
 backend/uploads/
+demo.mp4
 
 # ========================================
 # Logs

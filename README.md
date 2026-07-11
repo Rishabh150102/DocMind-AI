@@ -1,216 +1,356 @@
-# DeepLearning RAG Chatbot
+# 🚀 DocMind AI
 
-A modern AI-powered PDF chatbot built using **LangChain**, **FastAPI**, **ChromaDB**, and **Next.js**.  
-The application uses **Retrieval-Augmented Generation (RAG)** to answer questions from pre-indexed technical documents using semantic search and source-grounded responses with citations.
+An AI-powered document question answering application built using **FastAPI**, **LangChain**, **ChromaDB**, **OpenAI Embeddings**, **Mistral AI**, and **Next.js**.
 
-# Demo Video
-
-https://github.com/user-attachments/assets/0e6ea8b7-87f0-4769-8f38-2b9dbeb12650
-
-# Features
-
-- AI-powered PDF question answering
-- Retrieval-Augmented Generation (RAG)
-- Semantic document search using embeddings
-- Source citations with page references
-- FastAPI backend
-- Modern responsive frontend built with Next.js
-- Dark futuristic UI
-- Vector database using ChromaDB
-- Mistral LLM integration
-- OpenAI embeddings
+DocMind AI allows users to upload a PDF and ask natural language questions about its contents. It uses a Retrieval-Augmented Generation (RAG) pipeline to retrieve relevant document chunks and generate grounded answers with source citations.
 
 ---
 
-# Tech Stack
+# 🌐 Live Demo
 
-## Backend
-- Python
-- FastAPI
-- LangChain
-- ChromaDB
-- OpenAI Embeddings
-- Mistral AI
+### Frontend
 
-## Frontend
-- Next.js
-- Tailwind CSS
-- shadcn/ui
+https://YOUR_VERCEL_URL
+
+### Backend API
+
+https://YOUR_RENDER_URL/docs
 
 ---
 
-# Architecture
+# 📸 Screenshots
 
-```text
-Frontend (Next.js)
-        ↓
-FastAPI Backend
-        ↓
-LangChain RAG Pipeline
-        ↓
-ChromaDB Vector Store
-        ↓
-LLM Response Generation
+![1](screenshots/1.png)
+
+![2](screenshots/2.png)
+
+![3](screenshots/3.png)
+
+---
+
+# ✨ Features
+
+- 📄 Upload your own PDF documents
+- 🤖 AI-powered document question answering
+- 🔍 Semantic search using OpenAI Embeddings
+- 📚 ChromaDB Vector Database
+- 🧠 Retrieval-Augmented Generation (RAG)
+- 📍 Source citations with page numbers
+- ⚡ FastAPI REST API
+- 🎨 Modern responsive Next.js frontend
+- 🌙 Clean professional dark UI
+- ☁️ Cloud deployment (Render + Vercel)
+- ❌ Prevents hallucinations by answering only from uploaded documents
+
+---
+
+# 🏗️ System Architecture
+
+```
+                User Uploads PDF
+                        │
+                        ▼
+                PyPDFLoader
+                        │
+                        ▼
+     RecursiveCharacterTextSplitter
+                        │
+                        ▼
+          OpenAI Embeddings Model
+                        │
+                        ▼
+                  ChromaDB
+                        │
+                        ▼
+                MMR Retriever
+                        │
+                        ▼
+      Prompt + Retrieved Context
+                        │
+                        ▼
+                 Mistral AI
+                        │
+                        ▼
+     Answer + Source Citations
 ```
 
 ---
 
-# How It Works
+# ⚙️ Tech Stack
 
-1. PDF documents are loaded and split into chunks
-2. Text chunks are converted into embeddings
-3. Embeddings are stored in ChromaDB
-4. User query is semantically matched against document chunks
-5. Relevant context is sent to the LLM
-6. AI-generated response is returned with source citations
+## Backend
+
+- Python
+- FastAPI
+- LangChain
+- ChromaDB
+- OpenAI Embeddings (`text-embedding-3-small`)
+- Mistral AI
+- PyPDFLoader
+
+## Frontend
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+
+## Deployment
+
+- Render
+- Vercel
 
 ---
 
-# Project Structure
+# 📂 Project Structure
 
-```text
-project-root/
-│
+```
+DocMind-AI/
+
 ├── backend/
-│   ├── api.py
-│   ├── rag.py
-│   ├── create_database.py
-│   ├── chroma_db/
-│   ├── requirements.txt
-│   └── .env
 │
 ├── frontend/
-│   ├── app/
-│   ├── components/
-│   ├── public/
-│   ├── package.json
-│   └── ...
+│
+├── sample_documents/
+│      Foundations_of_Generative_AI_and_RAG.pdf
+│
+├── screenshots/
 │
 └── README.md
 ```
 
 ---
 
-# Backend Setup
+# 🚀 Local Setup
 
-## 1. Navigate to backend
+## Clone Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/DocMind-AI.git
+
+cd DocMind-AI
+```
+
+---
+
+## Backend
 
 ```bash
 cd backend
+
+python -m venv .venv
 ```
 
-## 2. Create virtual environment
+Windows
 
 ```bash
-python -m venv venv
+.venv\Scripts\activate
 ```
 
-## 3. Activate virtual environment
-
-### Windows
-
-```bash
-venv\Scripts\activate
-```
-
-### Mac/Linux
-
-```bash
-source venv/bin/activate
-```
-
-## 4. Install dependencies
+Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 5. Add environment variables
-
-Create a `.env` file:
+Create `.env`
 
 ```env
-OPENAI_API_KEY=your_openai_api_key
-MISTRAL_API_KEY=your_mistral_api_key
+OPENAI_API_KEY=YOUR_KEY
+
+MISTRAL_API_KEY=YOUR_KEY
 ```
 
-## 6. Create vector database
-
-```bash
-python create_database.py
-```
-
-## 7. Start FastAPI server
+Run
 
 ```bash
 uvicorn api:app --reload
 ```
 
-Backend runs at:
+Swagger UI
 
-```text
-http://127.0.0.1:8000
 ```
-
-Swagger docs:
-
-```text
 http://127.0.0.1:8000/docs
 ```
 
 ---
 
-# Frontend Setup
-
-## 1. Navigate to frontend
+## Frontend
 
 ```bash
 cd frontend
-```
 
-## 2. Install dependencies
-
-```bash
 npm install
 ```
 
-## 3. Run development server
+Create
+
+```
+.env.local
+```
+
+```env
+NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
+```
+
+Run
 
 ```bash
 npm run dev
 ```
 
-Frontend runs at:
+---
 
-```text
-http://localhost:3000
+# 📌 API Endpoints
+
+## Upload Document
+
 ```
+POST /upload
+```
+
+Uploads and indexes a PDF into the vector database.
 
 ---
 
-# API Response Format
+## Chat
+
+```
+POST /chat
+```
+
+Returns
 
 ```json
 {
-  "answer": "AI-generated response",
-  "sources": [
-    {
-      "page": 61,
-      "source": "deeplearning.pdf"
-    }
-  ]
+    "answer": "...",
+    "sources": [
+        {
+            "page": 4,
+            "source": "sample.pdf"
+        }
+    ]
 }
 ```
 
 ---
 
-# Future Improvements
+# 📄 Sample Knowledge Base
 
-- Dynamic PDF uploads
-- Multi-document support
-- Streaming responses
-- Conversational memory
+A professionally written AI reference document is included to quickly test the application.
+
+Location:
+
+```
+sample_documents/
+└── Foundations_of_Generative_AI_and_RAG.pdf
+```
+
+The document covers:
+
+- Artificial Intelligence
+- Machine Learning
+- Deep Learning
+- Transformers
+- Large Language Models
+- Embeddings
+- Vector Databases
+- Retrieval-Augmented Generation (RAG)
+- Real-world Applications
+- Future of AI
+
+Simply upload the PDF and begin asking questions.
+
+---
+
+# 🧪 Sample Questions
+
+## Artificial Intelligence
+
+- What is Artificial Intelligence?
+- Explain the history of AI.
+- What are the applications of AI?
+
+## Machine Learning
+
+- What is Machine Learning?
+- What are the three types of Machine Learning?
+- Explain supervised learning.
+- Explain reinforcement learning.
+
+## Deep Learning
+
+- What is Deep Learning?
+- Explain CNNs.
+- Explain RNNs.
+- Why are Transformers important?
+
+## Large Language Models
+
+- What is an LLM?
+- What are Tokens?
+- What is a Context Window?
+- Explain Prompt Engineering.
+- What are Hallucinations?
+
+## Retrieval-Augmented Generation (RAG)
+
+- What is RAG?
+- Explain the RAG pipeline.
+- Why is Chunking important?
+- What happens during Retrieval?
+- How does RAG reduce hallucinations?
+
+---
+
+
+# 💡 Engineering Highlights
+
+This project was built with a focus on production-oriented RAG architecture.
+
+Highlights include:
+
+- Dynamic PDF upload and indexing
+- Semantic retrieval using MMR
+- Grounded AI responses
+- Source citations with page numbers
+- Modular backend architecture
+- Environment-based configuration
+- Responsive frontend
+- Independent frontend and backend deployment
+
+---
+
+# 🚧 Current Limitations
+
+Current version supports:
+
+- Single active document per session
+- Text-based PDFs only
+
+Planned improvements:
+
+- OCR support for scanned PDFs
+- Multi-document retrieval
 - User authentication
-- Cloud deployment
-- Hybrid search
-- Reranking pipeline
+- Per-user vector databases
+- Persistent chat history
+- Streaming responses
+- Background document processing
+- Hybrid Search
+- Reranking Pipeline
+
+---
+
+# 👨‍💻 Author
+
+**Rishabh Rajput**
+
+LinkedIn
+
+(Add LinkedIn URL)
+
+---
+
+If you found this project useful, consider giving it a ⭐ on GitHub.
