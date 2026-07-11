@@ -49,13 +49,22 @@ async def upload(file: UploadFile):
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
+    print("Step 1: Upload request received")
     
     document = load_file(file_path)
+
+    print("Step 2: PDF loaded")
+    
     chunks = split_document(document)
+    
+    print(f"Step 3: Created {len(chunks)} chunks")
+
     vectorstore = create_vector_store(chunks)
+
+    print("Step 4: Vector store created")
         
     # 5. Return a valid JSON dictionary
-    return {"message": f"Document uploaded and processed successfully."}
+    return {"message": "Document uploaded and processed successfully."}
 
 @app.post("/chat")
 async def chat(query: Query):

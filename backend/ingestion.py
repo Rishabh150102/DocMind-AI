@@ -8,7 +8,10 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 # from langchain_community.vectorstores import Chroma
 from langchain_chroma import Chroma
+import time
 from dotenv import load_dotenv
+
+start = time.time()
 
 load_dotenv()
 
@@ -26,6 +29,7 @@ def load_file(file_path):
     # print(f"First Page Content: -\n {document[0]}")
     # print("*"*50)
 
+    print(time.time() - start)
     return document
 
 # Function for splitting into chunks
@@ -36,11 +40,15 @@ def split_document(document):
     # print(len(document[0].page_content))
     # print(chunks)
 
+    print(time.time() - start)
     return chunks
 
 # Function for creating a vectorstore
 embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
 def create_vector_store(chunks):
+
+    print("Creating embeddings...")
+
     vectorstore = Chroma(persist_directory="chroma_db", embedding_function=embedding_model)
 
     # Reseting ChromaDB
@@ -51,8 +59,11 @@ def create_vector_store(chunks):
 
     vectorstore.add_documents(chunks)
 
+    print("Embeddings stored successfully")
+
     print("Stored in ChromaDB")
     
+    print(time.time() - start)
     return vectorstore
 
 # Function to delete the ChromaDB and uploaded file
