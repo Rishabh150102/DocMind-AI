@@ -341,9 +341,7 @@ Planned improvements:
 
 **Rishabh Rajput**
 
-LinkedIn
-
-(Add LinkedIn URL)
+LinkedIn: https://www.linkedin.com/feed/update/urn:li:ugcPost:7481766054499704832/
 
 ---
 
