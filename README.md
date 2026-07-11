@@ -8,13 +8,7 @@ DocMind AI allows users to upload a PDF and ask natural language questions about
 
 # 🌐 Live Demo
 
-### Frontend
-
-https://YOUR_VERCEL_URL
-
-### Backend API
-
-https://YOUR_RENDER_URL/docs
+Link: https://doc-mind-ai-green.vercel.app/
 
 ---
 
@@ -127,7 +121,7 @@ DocMind-AI/
 ## Clone Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/DocMind-AI.git
+git clone https://github.com/Rishabh150102/DocMind-AI.git
 
 cd DocMind-AI
 ```
