@@ -11,7 +11,7 @@ load_dotenv()
 
 
 
-llm = ChatMistralAI(model="mistral-small-4")
+llm = ChatMistralAI(model="mistral-small-2603")
 
 # prompt template
 
