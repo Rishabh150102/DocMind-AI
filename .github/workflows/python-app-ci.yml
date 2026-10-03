@@ -29,4 +29,6 @@ jobs:
         pip install -r backend/requirements.txt
     - name: Check python syntax
       run: python -m compileall backend
+    - name: Build backend docker image
+      run: docker build --tag docmind-backend:ci ./backend
     
