@@ -305,4 +305,4 @@ Existing screenshots may predate Markdown and website inputs.
 
 **Rishabh Rajput**
 
-[Project post on LinkedIn](https://www.linkedin.com/feed/update/urn:li:ugcPost:7481766054499704832/)
+
