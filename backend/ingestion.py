@@ -3,11 +3,12 @@ import os
 import shutil
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFLoader, TextLoader, WebBaseLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 # from langchain_community.vectorstores import Chroma
 from langchain_chroma import Chroma
+from langchain_community.retrievers import BM25Retriever
 import time
 from dotenv import load_dotenv
 
@@ -15,9 +16,26 @@ start = time.time()
 
 load_dotenv()
 
+#Function for reading websites
+def load_url(url):
+    loader = WebBaseLoader(url)
+    document = loader.load()
+
+    print(time.time() - start)
+    return document
+
 # Function for loading file.
-def load_file(file_path):
-    loader = PyPDFLoader(file_path=file_path)
+def load_file(file_path: str):
+
+    file_ext = os.path.splitext(file_path)
+
+    if file_ext[-1].lower() == ".pdf":
+        loader = PyPDFLoader(file_path=file_path)
+    elif file_ext[-1].lower() == ".md" or file_ext[-1].lower() == ".markdown": 
+        loader = TextLoader(file_path=file_path, encoding="UTF-8")
+    else:
+        raise ValueError("Unsupported file type. Supported formats: PDF and Markdown.")
+
     document = loader.load()
     # print(len(document))
 
@@ -35,7 +53,13 @@ def load_file(file_path):
 # Function for splitting into chunks
 def split_document(document):
     # print(len(document))
-    chunks = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200).split_documents(document)
+
+    # Splitting the doc via token limit
+    chunks = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
+                model_name="text-embedding-3-small",
+                chunk_size=700,
+                chunk_overlap=100
+            ).split_documents(documents=document)
     # print("chunks")
     # print(len(document[0].page_content))
     # print(chunks)
@@ -66,6 +90,27 @@ def create_vector_store(chunks):
     print(time.time() - start)
     return vectorstore
 
+def bm25_index(chunks):
+
+    # Creating indexes for BM25
+    bm25_indexing = BM25Retriever.from_documents(chunks)
+    bm25_indexing.k = 5
+
+    return bm25_indexing
+
+
+def process_documents(document):
+
+    chunks = split_document(document)
+
+    reset_knowledge_base()
+
+    vectorstore = create_vector_store(chunks)
+
+    bm25_retriever = bm25_index(chunks)
+
+    return bm25_retriever
+
 # Function to delete the ChromaDB and uploaded file
 def reset_knowledge_base():        
     
@@ -82,34 +127,3 @@ def reset_knowledge_base():
 
     return "Everything clear and ready to use."
 
-
-# embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
-# vectorstore = Chroma(persist_directory="chroma_db", embedding_function=embedding_model)
-
-# def get_splitter(file_type: str):
-#     if file_type == "pdf":
-#         return RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-#     elif file_type == "docx":
-#         return RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-#     else:
-#         return RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-
-# def ingest_document(file_path: str):
-#     file_extension = os.path.splitext(file_path)[1].lower()
-    
-#     if file_extension == ".pdf":
-#         loader = PyPDFLoader(file_path)
-#         file_type = "pdf"
-#     elif file_extension == ".docx":
-#         loader = UnstructuredWordDocumentLoader(file_path)
-#         file_type = "docx"
-#     else:
-#         loader = TextLoader(file_path)
-#         file_type = "text"
-        
-#     docs = loader.load()
-#     splitter = get_splitter(file_type)
-#     chunks = splitter.split_documents(docs)
-    
-#     vectorstore.add_documents(chunks)
-#     return f"Processed {len(chunks)} chunks"

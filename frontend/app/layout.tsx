@@ -9,7 +9,7 @@ const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono"
 
 export const metadata: Metadata = {
   title: 'DocMind AI',
-  description: 'Upload a PDF and start asking intelligent questions about your document.',
+  description: 'Upload a document (PDF or Markdown) or submit a website to start asking intelligent questions with DocMind AI.',
   generator: 'v0.app',
   icons: {
     icon: [
