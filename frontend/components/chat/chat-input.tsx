@@ -14,7 +14,7 @@ interface ChatInputProps {
 export function ChatInput({
   onSendMessage,
   disabled = false,
-  placeholder = "Ask anything about your uploaded document...",
+  placeholder = "Ask anything about your document or website...",
 }: ChatInputProps) {
   const [message, setMessage] = useState("")
   const textareaRef = useRef<HTMLTextAreaElement>(null)

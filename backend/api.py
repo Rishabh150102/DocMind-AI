@@ -1,15 +1,18 @@
 import shutil
 import os
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from ingestion import load_file, split_document, reset_knowledge_base, create_vector_store
+from pydantic import BaseModel, HttpUrl
+from ingestion import load_file
 from rag import ask_question
+from ingestion import process_documents, load_url
 # from backend.rag import ask_question
 # from backend.ingestion import ingest_document
 
 
+
 app = FastAPI()
+app.state.bm25_retriever = None
 
 # CORS configuration
 app.add_middleware(
@@ -24,16 +27,24 @@ app.add_middleware(
 class Query(BaseModel):
     question: str
 
+class UrlSchema(BaseModel):
+    url: HttpUrl
 
-# # API endpoint
-# @app.post("/chat")
-# async def chat(query: Query):
-#     return {"answer": "Not implemented"}
+@app.post("/url")
+async def url_upload(url: UrlSchema):
+
+    document = load_url(str(url.url))
+
+    app.state.bm25_retriever = None
+
+    app.state.bm25_retriever = process_documents(document)
+    
+    return {"message": "Web page loaded and processed successfully."}
+
+
 
 @app.post("/upload")
 async def upload(file: UploadFile):
-    #Calling this function to reset everything.
-    reset_knowledge_base()
 
     # 1. Use relative path so it creates the folder in your project root
     upload_dir = "uploads" 
@@ -48,27 +59,26 @@ async def upload(file: UploadFile):
     # 4. Open the destination file and copy the file stream correctly
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-
-    print("Step 1: Upload request received")
     
     document = load_file(file_path)
 
-    print("Step 2: PDF loaded")
-    
-    chunks = split_document(document)
-    
-    print(f"Step 3: Created {len(chunks)} chunks")
+    app.state.bm25_retriever = None
 
-    vectorstore = create_vector_store(chunks)
-
-    print("Step 4: Vector store created")
+    app.state.bm25_retriever = process_documents(document)
         
-    # 5. Return a valid JSON dictionary
     return {"message": "Document uploaded and processed successfully."}
 
-@app.post("/chat")
-async def chat(query: Query):
 
-    return ask_question(query.question)
+@app.post("/chat")
+async def chat(query: Query, request: Request):
+    bm25_retriever = request.app.state.bm25_retriever
+
+    if bm25_retriever is None:
+        raise HTTPException(
+            status_code=409,
+            detail="Upload a PDF before asking a question."
+        )
+
+    return ask_question(query.question, bm25_retriever)
 
 
